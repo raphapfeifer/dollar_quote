@@ -22,8 +22,8 @@ jobs:
         run: |
           mkdir -p build
           pip install -r requirements.txt -t build/
-          cp app/lambda_function.py build/
-          cp -r app/service/ build/service/
+          cp app/quote_handler.py build/lambda_function.py
+          
 
       - name: Zip deployment package
         run: |
@@ -39,6 +39,6 @@ jobs:
 
       - name: Deploy to AWS Lambda
         run: |
-          aws lambda update-function-configuration \
+          aws lambda update-function-code \
             --function-name dollar_quote \
-            --handler app.lambda_function.lambda_handler
+            --zip-file fileb://deployment.zip
