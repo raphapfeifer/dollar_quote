@@ -1,8 +1,9 @@
 import os
 import httpx
-from dotenv import load_dotenv
+if os.getenv('AWS_EXECUTION_ENV') is None:
+    from dotenv import load_dotenv
+    load_dotenv()
 
-load_dotenv()
 
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
 
