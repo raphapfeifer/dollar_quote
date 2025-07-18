@@ -1,10 +1,16 @@
+import os
 import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+
+QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
 
 async def search_dollar_quote():
-    url = 'https://economia.awesomeapi.com.br/json/last/USD-BRL'
+    
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(url)
+            response = await client.get(QUOTE_API_URL_DOLLAR)
             response.raise_for_status()
             data = response.json()
             print(data['USDBRL']['bid'])
