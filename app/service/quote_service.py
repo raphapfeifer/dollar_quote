@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import httpx
 if os.getenv('AWS_EXECUTION_ENV') is None:
@@ -6,6 +7,7 @@ if os.getenv('AWS_EXECUTION_ENV') is None:
 
 
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
+META_GRAPH_API_URL = os.getenv("META_GRAPH_API_URL")
 PHONE_ID = os.getenv('PHONE_ID')
 TOKEN = os.getenv('TOKEN')
 PHONE_NUMBER_DESTINATION = os.getenv('PHONE_NUMBER_DESTINATION')
@@ -20,8 +22,8 @@ async def search_dollar_quote():
             data = response.json()
 
             quote = data['USDBRL']['bid']
-            date = data['USDBRL']['create_date']
-            message = f'The dollar exchange rate in {date} is : R$ {quote}'
+            date = datetime.strptime(data['USDBRL']['create_date'], "%Y-%m-%d %H:%M:%S").strftime("%d %b %Y at %H:%M")
+            message = f'The dollar exchange rate on {date} is : R$ {float(quote):.2f}'
 
             await send_to_whatsapp(message)
 
@@ -29,7 +31,7 @@ async def search_dollar_quote():
         print(f'Error in dollar search request: {e}')
 
 async def send_to_whatsapp(message: str):
-    url = f"https://graph.facebook.com/v22.0/{PHONE_ID}/messages"
+    url = f"{META_GRAPH_API_URL}/{PHONE_ID}/messages"
     headers = {
             "Authorization": f"Bearer {TOKEN}",
             "Content-Type": "application/json"
