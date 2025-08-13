@@ -1,16 +1,21 @@
 from datetime import datetime
 import os
 import httpx
-if os.getenv('AWS_EXECUTION_ENV') is None:
-    from dotenv import load_dotenv
-    load_dotenv()
+import boto3
+import json
+from botocore.exceptions import ClientError
 
+#if os.getenv('AWS_EXECUTION_ENV') is None:
+#    from dotenv import load_dotenv
+ #   load_dotenv()
+
+secrets = get_secrets("whatsapp/credentials")
 
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
 META_GRAPH_API_URL = os.getenv("META_GRAPH_API_URL")
-PHONE_ID = os.getenv('PHONE_ID')
-TOKEN = os.getenv('TOKEN')
-PHONE_NUMBER_DESTINATION = os.getenv('PHONE_NUMBER_DESTINATION')
+PHONE_ID = secrets.getenv('PHONE_ID')
+TOKEN = secrets.getenv('TOKEN')
+PHONE_NUMBER_DESTINATION = secrets.getenv('PHONE_NUMBER_DESTINATION')
 
 
 async def search_dollar_quote():
@@ -24,7 +29,7 @@ async def search_dollar_quote():
             quote = data['USDBRL']['bid']
             date = datetime.strptime(data['USDBRL']['create_date'], "%Y-%m-%d %H:%M:%S").strftime("%d %b %Y at %H:%M")
             message = f'The dollar exchange rate on {date} is : R$ {float(quote):.2f}'
-
+            
             await send_to_whatsapp(message)
 
     except Exception as e:
@@ -45,4 +50,14 @@ async def send_to_whatsapp(message: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=payload)
-        response.raise_for_status()      
+        response.raise_for_status()
+
+async def get_secrets(secret_name: str, region_name: str = "us-east-2"):
+    client = boto3.client("secretsmanager", region_name=region_name)
+    try:
+        response = client.get_secret_value(SecretId=secret_name)
+        secret = json.loads(response["SecretString"])
+        return secret
+    except ClientError as e:
+        print(f"Unable to retrieve secret {e}")
+        return None              
