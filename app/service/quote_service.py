@@ -9,6 +9,16 @@ from botocore.exceptions import ClientError
 #    from dotenv import load_dotenv
  #   load_dotenv()
 
+async def get_secrets(secret_name: str, region_name: str = "us-east-2"):
+    client = boto3.client("secretsmanager", region_name=region_name)
+    try:
+        response = client.get_secret_value(SecretId=secret_name)
+        secret = json.loads(response["SecretString"])
+        return secret
+    except ClientError as e:
+        print(f"Unable to retrieve secret {e}")
+        return None
+
 secrets = get_secrets("whatsapp/credentials")
 
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
@@ -51,13 +61,4 @@ async def send_to_whatsapp(message: str):
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=payload)
         response.raise_for_status()
-
-async def get_secrets(secret_name: str, region_name: str = "us-east-2"):
-    client = boto3.client("secretsmanager", region_name=region_name)
-    try:
-        response = client.get_secret_value(SecretId=secret_name)
-        secret = json.loads(response["SecretString"])
-        return secret
-    except ClientError as e:
-        print(f"Unable to retrieve secret {e}")
-        return None              
+         
