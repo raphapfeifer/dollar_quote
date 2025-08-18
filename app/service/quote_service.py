@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 #    from dotenv import load_dotenv
  #   load_dotenv()
 
-async def get_secrets(secret_name: str, region_name: str = "us-east-2"):
+def get_secrets(secret_name: str, region_name: str = "us-east-2"):
     client = boto3.client("secretsmanager", region_name=region_name)
     try:
         response = client.get_secret_value(SecretId=secret_name)
