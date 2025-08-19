@@ -23,9 +23,9 @@ secrets = get_secrets("whatsapp/credentials")
 
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
 META_GRAPH_API_URL = os.getenv("META_GRAPH_API_URL")
-PHONE_ID = secrets.getenv('PHONE_ID')
-TOKEN = secrets.getenv('TOKEN')
-PHONE_NUMBER_DESTINATION = secrets.getenv('PHONE_NUMBER_DESTINATION')
+PHONE_ID = secrets.get('PHONE_ID')
+TOKEN = secrets.get('TOKEN')
+PHONE_NUMBER_DESTINATION = secrets.get('PHONE_NUMBER_DESTINATION')
 
 
 async def search_dollar_quote():
