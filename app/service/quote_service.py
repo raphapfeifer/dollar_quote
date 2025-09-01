@@ -5,9 +5,9 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 
-#if os.getenv('AWS_EXECUTION_ENV') is None:
-#    from dotenv import load_dotenv
- #   load_dotenv()
+if os.getenv('AWS_EXECUTION_ENV') is None:
+    from dotenv import load_dotenv
+    load_dotenv()
 
 def get_secrets(secret_name: str, region_name: str = "us-east-2"):
     client = boto3.client("secretsmanager", region_name=region_name)
@@ -24,7 +24,7 @@ secrets = get_secrets("whatsapp/credentials")
 QUOTE_API_URL_DOLLAR = os.getenv('QUOTE_API_URL_DOLLAR')
 META_GRAPH_API_URL = os.getenv("META_GRAPH_API_URL")
 PHONE_ID = secrets.get('PHONE_ID')
-TOKEN = secrets.get('TOKEN')
+TOKEN = os.getenv("TOKEN") or secrets.get('TOKEN', '').strip()
 PHONE_NUMBER_DESTINATION = secrets.get('PHONE_NUMBER_DESTINATION')
 
 
@@ -60,5 +60,7 @@ async def send_to_whatsapp(message: str):
 
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=payload)
+        print(f"Status code: {response.status_code}")
+        print(f"Response body: {response.text}")
         response.raise_for_status()
          
