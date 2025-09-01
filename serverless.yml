@@ -1,0 +1,29 @@
+service: dollar-quote-service
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-2
+
+functions:
+  searchQuote: 
+    handler: app.quote_handler.lambda_handler
+    events:
+      - http:
+          path: quote
+          method: get
+
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+
+custom:
+  pythonRequirements:
+    dockerizePIp: true
+  dotenv:
+    include:
+      - QUOTE_API_URL_DOLLAR
+      - PHONE_ID
+      - TOKEN
+      - PHONE_NUMBER_DESTINATION  
